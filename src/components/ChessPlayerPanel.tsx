@@ -118,13 +118,13 @@ const ChessPlayerPanel: FC<ChessPlayerPanelProps> = ({color}) => {
 
   // choose color for the panel
   const bgColor = useMemo(() => {
-    let color = 'bg-gray-300';
+    let color = 'bg-gray-200';
     if (running) {
       color = 'bg-green-300';
     } else if (lost) {
       color = 'bg-red-300';
     } else if (isActive) {
-      color = 'bg-gray-400';
+      color = 'bg-gray-300';
     }
     return color;
   }, [running, lost, isActive]);

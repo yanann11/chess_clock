@@ -1,7 +1,7 @@
 import { FC, useCallback, useState, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 
-import { INITIAL_TIME, INITIAL_INCREMENT, CHESS_CLOCK_MAX_WIDTH, CHESS_CLOCK_MAX_HEIGHT } from "@/consts";
+import { INITIAL_TIME, INITIAL_INCREMENT } from "@/consts";
 import { CHESS_PLAYER_COLOR } from "@/types";
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 
 import { saveSettings } from "@/store/rootReducer";
 import { AppDispatch } from "@/store";
-import { formatTimeControl, generateSliderTimeSteps, generateSliderIncrementSteps, getSliderIndexByValue } from "@/helpers";
+import { formatTimeControl, generateSliderTimeSteps, generateSliderIncrementSteps, getSliderIndexByValue, getChessClockSize } from "@/helpers";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 const presetTimeControls = [
     '1+0', '2+1', '3+0',
@@ -34,6 +35,9 @@ type ChessPlayerSettingsProps = {
 
 const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen, onClose, timeControl}) => {
     const dispatch = useDispatch<AppDispatch>();
+
+    const windowSize =  useWindowSize();
+    const chessClockSize = getChessClockSize(windowSize);
 
     const [timeControlValue, setTimeControlValue] = useState(timeControl);
     const [customTime, setCustomTime] = useState(0);
@@ -81,7 +85,7 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent
-                style={{ width: `${CHESS_CLOCK_MAX_WIDTH}px`, height: `${CHESS_CLOCK_MAX_HEIGHT}px`, maxWidth: "100vw", maxHeight: "100vh" }}
+                style={{ width: chessClockSize.width, height: chessClockSize.height }}
             >
                 <DialogHeader>
                     <DialogTitle>{'Chess clock settings'}</DialogTitle>

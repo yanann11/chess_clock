@@ -1,4 +1,5 @@
-import { HOUR, MINUTE } from '@/consts';
+import { HOUR, MINUTE, CHESS_CLOCK_HEIGHT, CHESS_CLOCK_WIDTH } from "@/consts";
+import { WINDOW_SIZE, CHESS_CLOCK_SIZE } from "@/types";
 
 const secondsToTime = (value: number): string => {
   const hours = Math.floor(value / HOUR);
@@ -46,6 +47,16 @@ const getSliderIndexByValue = (steps: number[], value: number): number => {
   return index === -1 ? 0 : index;
 };
 
+
+const getChessClockSize = (windowSize: WINDOW_SIZE): CHESS_CLOCK_SIZE => {
+  // if the available width is too small, use full screen for the chess clock.
+  if ((windowSize.width - CHESS_CLOCK_HEIGHT) < 100) {
+    return { width: "100vw", height: "100vh"};
+  }
+  // otherwise, use fixed dimensions.
+  return { width: `${CHESS_CLOCK_WIDTH}px`, height: `${CHESS_CLOCK_HEIGHT}px`};
+};
+
 export {
   secondsToTime,
   secondsToString,
@@ -54,6 +65,8 @@ export {
 
   generateSliderTimeSteps,
   generateSliderIncrementSteps,
-  getSliderIndexByValue
+  getSliderIndexByValue,
+
+  getChessClockSize
 };  
   

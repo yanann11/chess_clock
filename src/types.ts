@@ -28,4 +28,14 @@ export interface SAVE_SETTINGS_ACTION {
     time: number;
     increment: number;
     useForBothPlayers: boolean;
-}
+};
+
+export type WINDOW_SIZE = {
+    width: number;
+    height: number;
+};
+
+export type CHESS_CLOCK_SIZE = {
+    width: string;
+    height: string;
+};
