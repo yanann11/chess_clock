@@ -93,7 +93,6 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                             const isActive = i === 'custom' && isCustomTimeControl || i === timeControlValue;
                             return (
                                 <Button
-                                    className={isActive? 'bg-indigo-800 hover:bg-indigo-600': ''}
                                     key={i}
                                     variant={isActive ? "default" : "secondary"}
                                     onClick={() => setTimeControlValue(i)}
