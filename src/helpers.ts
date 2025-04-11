@@ -55,7 +55,6 @@ const getSliderIndexByValue = (steps: number[], value: number): number => {
   return index === -1 ? 0 : index;
 };
 
-
 const getTimeControlValue = (time: number, increment: number): string => {
   return `${time}+${increment}`;
 };

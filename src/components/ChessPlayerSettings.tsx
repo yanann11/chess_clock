@@ -51,9 +51,9 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
         }
     }, [
         open,
-        setUseForBothPlayers,
         setCustomTime,
-        setCustomIncrement
+        setCustomIncrement,
+        setUseForBothPlayers
     ]);
 
     // sync timeControlValue with sliders' values
@@ -70,14 +70,11 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
         timeControlValue
     ]);
 
+    // save settings
     const onDialogClose = useCallback(() => {
-        let time, increment;
-        if (isCustomTimeControl) {
-            time = customTimeSteps[customTime];
-            increment = customIncrementSteps[customIncrement];
-        } else {        
-            [time, increment] = timeControlValue.split('+').map((val) => Number(val));
-        }
+        const [time, increment] = isCustomTimeControl ?
+            [customTimeSteps[customTime], customIncrementSteps[customIncrement]] :
+            extractTimeControlValue(timeControlValue);
         dispatch(saveSettings({ color, time: time, increment, useForBothPlayers }));
         onClose(); 
     }, [
@@ -130,7 +127,7 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                         })}
                     </div>
                     <div className={'flex items-center flex-col mt-2'}>
-                        {formatTimeControl(isCustomTimeControl ? `${customTimeSteps[customTime]}+${customIncrementSteps[customIncrement]}` : timeControlValue)}
+                        {formatTimeControl(isCustomTimeControl ? getTimeControlValue(customTimeSteps[customTime], customIncrementSteps[customIncrement]) : timeControlValue)}
                     </div>
                     <Slider
                         id="sliderTime"
@@ -149,8 +146,8 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                         onValueChange={([newIndex]) => setCustomIncrement(newIndex)}
                     />
                     <div className="flex items-center space-x-2">
-                        <Switch id="airplane-mode" checked={useForBothPlayers} onCheckedChange={setUseForBothPlayers}/>
-                        <Label htmlFor="airplane-mode">Use for both players</Label>
+                        <Switch id="useForBothPlayers" checked={useForBothPlayers} onCheckedChange={setUseForBothPlayers}/>
+                        <Label htmlFor="useForBothPlayers">Use for both players</Label>
                     </div>
                 </div>
                 <DialogFooter>

@@ -1,18 +1,40 @@
-import { useCallback, useRef, useEffect } from "react";
+import { ReactElement, useState, useCallback, useEffect, useRef, forwardRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { CHESS_CLOCK_STATUS } from "@/types";
 import { AppDispatch, RootState } from "@/store";
 import { pause, start, reset, selectStatus } from "@/store/rootReducer";
 
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/Icon";
 
 const STATUSES_FOR_START_ACTION = [CHESS_CLOCK_STATUS.INITIAL, CHESS_CLOCK_STATUS.PAUSED];
+
+type ControlPanelButtonProps = {
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  icon?: ReactElement;
+};
+
+const ControlPanelButton = forwardRef<HTMLButtonElement, ControlPanelButtonProps>(
+  ({ onClick, icon }, ref) => {
+    return (
+      <button
+        className="w-12 h-12 mr-2 flex items-center justify-center rounded-full bg-indigo-800 hover:bg-indigo-600 text-white"
+        onClick={onClick}
+        ref={ref}
+      >
+        {icon}
+      </button>
+    );
+  }
+);
 
 const ControlsPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const startButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
 
   const status = useSelector((state: RootState) => selectStatus(state));
 
@@ -30,8 +52,13 @@ const ControlsPanel = () => {
   }, [ status ]);
 
   const onResetClick = useCallback(() => {
+    setShowResetConfirmation(true);
+  }, [setShowResetConfirmation]);
+
+  const onConfirmResetClick = useCallback(() => {
+    setShowResetConfirmation(false);
     dispatch(reset());
-  }, []);
+  }, [setShowResetConfirmation]);
 
   useEffect(() => {
     if (!startButtonRef.current) {
@@ -45,24 +72,48 @@ const ControlsPanel = () => {
     }
   }, [status]);
 
+  const content = (showResetConfirmation) ? (
+    <>
+    <div className="flex items-center justify-center gap-4 p-4  text-black">
+      <span className="text-sm font-medium">Reset?</span>
+      <Button
+        className="px-3 py-1 text-sm"
+        variant="secondary"
+        onClick={onConfirmResetClick}
+      >
+        Yes
+      </Button>
+      <Button
+        className="px-3 py-1 text-sm"
+        variant="secondary"
+        onClick={() => setShowResetConfirmation(false)}
+      >
+        No
+      </Button>
+    </div>
+    </>
+  ) : (
+    <>
+      {status !== CHESS_CLOCK_STATUS.RUNNING ? (
+        <ControlPanelButton
+          onClick={onResetClick}
+          icon={(<Icon size={32} name={'reset'}/>)}
+        />
+        ) : null}
+      {status !== CHESS_CLOCK_STATUS.FINISHED ? (
+        <ControlPanelButton
+          onClick={onActionClick}
+          icon={(<Icon size={32} name={status === CHESS_CLOCK_STATUS.RUNNING ? 'pause': 'play'}/> )}
+          ref={startButtonRef}
+        />
+      ) : null}
+    </>
+  );
+
   return (
     <div className="flex flex-row items-center justify-center p-4 bg-stone-300 text-black border-t border-b border-indigo-800 w-full"
          style={{ height: "50px" }}>
-      <button
-        className="w-12 h-12 mr-2 flex items-center justify-center rounded-full bg-indigo-800 hover:bg-indigo-600 text-white"
-        onClick={onResetClick}
-      >
-        <Icon size={32} name={'reset'}/>   
-      </button>
-      {status !== CHESS_CLOCK_STATUS.FINISHED ? (
-        <button 
-          ref={startButtonRef}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-800 hover:bg-indigo-600 text-white"
-          onClick={onActionClick}
-        > 
-          <Icon size={32} name={status === CHESS_CLOCK_STATUS.RUNNING ? 'pause': 'play'}/>      
-        </button>
-      ) : null}
+      {content}
     </div>
   );
 };
