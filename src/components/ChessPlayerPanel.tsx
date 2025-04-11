@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { CHESS_CLOCK_STATUS, CHESS_PLAYER_COLOR } from "@/types";
 import { AppDispatch, RootState } from "@/store";
 import { selectChessPlayer, selectStatus, finish, chessPlayerClick } from "@/store/rootReducer";
-import { secondsToTime, secondsToString } from "../helpers";
+import { secondsToTime, getTimeControlValue, formatTimeControl } from "../helpers";
 import { cn } from "@/lib/utils";
 
 import { ChessPlayerSettings } from "./ChessPlayerSettings";
@@ -28,7 +28,7 @@ const ChessPlayerPanel: FC<ChessPlayerPanelProps> = ({color}) => {
 
   const running = chessClockStatus === CHESS_CLOCK_STATUS.RUNNING && isActive;
   const lost = chessClockStatus === CHESS_CLOCK_STATUS.FINISHED && timerTime === 0;
-  const timeControl = secondsToString(time) + '+' + secondsToString(increment);
+  const timeControl = getTimeControlValue(time, increment);
 
   // funcrion for stopping the timer
   const clearTimer = useCallback(() => {
@@ -144,7 +144,7 @@ const ChessPlayerPanel: FC<ChessPlayerPanelProps> = ({color}) => {
             className="gap-2 mt-2 text-2xl bg-gray-100 border-indigo-800 border"
             onClick={() => setIsSettingsOpen(true)}
           >
-              <span>{timeControl}</span>
+              <span>{formatTimeControl(timeControl, true)}</span>
               {chessClockStatus === CHESS_CLOCK_STATUS.INITIAL ? (<Icon name="edit" size={16}/>) : null}
           </Button> 
       ) : null}

@@ -1,7 +1,7 @@
 import { FC, useCallback, useState, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 
-import { INITIAL_TIME, INITIAL_INCREMENT } from "@/consts";
+import { INITIAL_TIME, INITIAL_INCREMENT, TIME_CONTROL } from "@/consts";
 import { CHESS_PLAYER_COLOR } from "@/types";
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,15 +12,13 @@ import { Label } from "@/components/ui/label";
 
 import { saveSettings } from "@/store/rootReducer";
 import { AppDispatch } from "@/store";
-import { formatTimeControl, generateSliderTimeSteps, generateSliderIncrementSteps, getSliderIndexByValue, getChessClockSize } from "@/helpers";
+import {
+    getTimeControlValue, extractTimeControlValue, formatTimeControl, 
+    generateSliderTimeSteps, generateSliderIncrementSteps, getSliderIndexByValue, getChessClockSize } from "@/helpers";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
-const presetTimeControls = [
-    '1+0', '2+1', '3+0',
-    '3+2', '5+0', '5+3',
-    '10+0', '10+5', '15+10',
-    '20+10', '30+0', 'custom'
-];
+type TimeControlKey = keyof typeof TIME_CONTROL;
+const presetTimeControls: TimeControlKey[] = Object.keys(TIME_CONTROL) as TimeControlKey[];
 
 const customTimeSteps = generateSliderTimeSteps();
 const customIncrementSteps = generateSliderIncrementSteps();
@@ -47,7 +45,7 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
     // set initial values after closing dialog
     useEffect(() => {
         if (!open) {
-            setCustomTime(getSliderIndexByValue(customTimeSteps, INITIAL_TIME / 60));
+            setCustomTime(getSliderIndexByValue(customTimeSteps, INITIAL_TIME));
             setCustomIncrement(getSliderIndexByValue(customIncrementSteps, INITIAL_INCREMENT));
             setUseForBothPlayers(true);
         }
@@ -58,7 +56,17 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
         setCustomIncrement
     ]);
 
-    const isCustomTimeControl = useMemo(() => timeControlValue === 'custom' || !presetTimeControls.includes(timeControlValue), [
+    // sync timeControlValue with sliders' values
+    useEffect(() => {
+        const newTimeControlValue = getTimeControlValue(customTimeSteps[customTime], customIncrementSteps[customIncrement]);
+        setTimeControlValue(newTimeControlValue);          
+    }, [
+        customTime,
+        customIncrement,
+        setTimeControlValue,
+    ]);
+
+    const isCustomTimeControl = useMemo(() => timeControlValue === 'custom' || !(timeControlValue in TIME_CONTROL), [
         timeControlValue
     ]);
 
@@ -70,7 +78,7 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
         } else {        
             [time, increment] = timeControlValue.split('+').map((val) => Number(val));
         }
-        dispatch(saveSettings({ color, time: time* 60, increment, useForBothPlayers }));
+        dispatch(saveSettings({ color, time: time, increment, useForBothPlayers }));
         onClose(); 
     }, [
         color,
@@ -80,6 +88,21 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
         customIncrement,
         useForBothPlayers,
         onClose
+    ]);
+
+    // update sliders for current timeControlValue
+    const onTimeControlClick = useCallback((i: TimeControlKey) => {
+        setTimeControlValue(i);
+        if (i === 'custom') {
+            return;
+        }
+        const [time, increment] = extractTimeControlValue(i);
+        setCustomTime(getSliderIndexByValue(customTimeSteps, time));
+        setCustomIncrement(getSliderIndexByValue(customIncrementSteps, increment))
+    }, [
+        setTimeControlValue,
+        setCustomTime,
+        setCustomIncrement,
     ]);
 
     return (
@@ -99,9 +122,9 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                                 <Button
                                     key={i}
                                     variant={isActive ? "default" : "secondary"}
-                                    onClick={() => setTimeControlValue(i)}
+                                    onClick={() => onTimeControlClick(i)}
                                 >
-                                    {i === 'custom' ? 'Custom': i}
+                                    {TIME_CONTROL[i]}
                                 </Button>
                             );
                         })}
@@ -110,7 +133,6 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                         {formatTimeControl(isCustomTimeControl ? `${customTimeSteps[customTime]}+${customIncrementSteps[customIncrement]}` : timeControlValue)}
                     </div>
                     <Slider
-                        disabled={!isCustomTimeControl}
                         id="sliderTime"
                         min={0}
                         max={customTimeSteps.length - 1}
@@ -119,7 +141,6 @@ const ChessPlayerSettings :FC<ChessPlayerSettingsProps> = ({color, open, setOpen
                         onValueChange={([newIndex]) => setCustomTime(newIndex)}
                     />
                     <Slider
-                        disabled={!isCustomTimeControl}
                         id="sliderIncrement"
                         min={0}
                         max={customIncrementSteps.length - 1}
