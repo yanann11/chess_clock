@@ -36,24 +36,28 @@ const ControlsPanel = () => {
 
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
 
-  const status = useSelector((state: RootState) => selectStatus(state));
+  const chessClockStatus = useSelector((state: RootState) => selectStatus(state));
 
   const onActionClick = useCallback((event: React.MouseEvent) => {
     // ignore key press if it's not in a state that allows starting the action
-    if (event.detail === 0 && !STATUSES_FOR_START_ACTION.includes(status)) {
+    if (event.detail === 0 && !STATUSES_FOR_START_ACTION.includes(chessClockStatus)) {
       return;
     }
 
-    if (status === CHESS_CLOCK_STATUS.RUNNING) {
+    if (chessClockStatus === CHESS_CLOCK_STATUS.RUNNING) {
       dispatch(pause());
     } else {
       dispatch(start());
     }
-  }, [ status ]);
+  }, [ chessClockStatus ]);
 
   const onResetClick = useCallback(() => {
-    setShowResetConfirmation(true);
-  }, [setShowResetConfirmation]);
+    if (chessClockStatus === CHESS_CLOCK_STATUS.FINISHED) {
+      dispatch(reset());
+    } else {
+      setShowResetConfirmation(true);
+    }
+  }, [chessClockStatus, setShowResetConfirmation]);
 
   const onConfirmResetClick = useCallback(() => {
     setShowResetConfirmation(false);
@@ -65,7 +69,7 @@ const ControlsPanel = () => {
       return;
     }
     // remove focus from the start button if the current state doesn't allow starting the action; otherwise, keep it focused
-    if (STATUSES_FOR_START_ACTION.includes(status)) {
+    if (STATUSES_FOR_START_ACTION.includes(chessClockStatus)) {
       startButtonRef.current.focus();
     } else {
       startButtonRef.current.blur();
@@ -94,7 +98,7 @@ const ControlsPanel = () => {
     </>
   ) : (
     <>
-      {status !== CHESS_CLOCK_STATUS.RUNNING ? (
+      {chessClockStatus !== CHESS_CLOCK_STATUS.RUNNING ? (
         <ControlPanelButton
           onClick={onResetClick}
           icon={(<Icon size={32} name={'reset'}/>)}
@@ -103,7 +107,7 @@ const ControlsPanel = () => {
       {status !== CHESS_CLOCK_STATUS.FINISHED ? (
         <ControlPanelButton
           onClick={onActionClick}
-          icon={(<Icon size={32} name={status === CHESS_CLOCK_STATUS.RUNNING ? 'pause': 'play'}/> )}
+          icon={(<Icon size={32} name={chessClockStatus === CHESS_CLOCK_STATUS.RUNNING ? 'pause': 'play'}/> )}
           ref={startButtonRef}
         />
       ) : null}
@@ -111,8 +115,7 @@ const ControlsPanel = () => {
   );
 
   return (
-    <div className="flex flex-row items-center justify-center p-4 bg-stone-300 text-black border-t border-b border-indigo-800 w-full"
-         style={{ height: "50px" }}>
+    <div className="flex flex-row items-center justify-center h-[50px] p-4 bg-stone-300 text-black border-t border-b border-indigo-800 w-full">
       {content}
     </div>
   );

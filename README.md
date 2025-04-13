@@ -10,13 +10,16 @@ A simple and customizable chess clock built with React. [Live Demo](https://ches
 
  - Classic chess timer with customizable time controls
 
+ - Pause and reset functionality
+
+ - Opportunity to add time to a player (for illegal moves)
+
  - Clean and responsive user interface
 
  - Keyboard shortcuts for quick control
 
  - Optimized for mobile devices
 
- - Pause and reset functionality
 
 
 ### Tech stack

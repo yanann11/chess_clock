@@ -134,7 +134,18 @@ const ChessPlayerPanel: FC<ChessPlayerPanelProps> = ({color}) => {
       className={cn('flex flex-col items-center justify-center w-full h-full p-4 text-black', bgColor)}
       onClick={onClick}
     >
-      <div className="text-6xl font-bold">
+      <div className="relative text-6xl font-bold group">
+        {chessClockStatus === CHESS_CLOCK_STATUS.PAUSED ? (
+          <span
+            className="absolute -top-2 -right-2 w-8 h-8 bg-gray-200 text-black text-base flex items-center justify-center
+              rounded-full shadow-md shadow-indigo-800 border border-indigo-400 cursor-pointer opacity-0 
+              group-hover:opacity-100 hover:bg-gray-300"
+            title="Add 1 minute"
+            onClick={() => changeTimeValue(60)}
+          >
+            +1
+          </span>
+        ) : null}
         {secondsToTime(timerTime)}
       </div>
       {![CHESS_CLOCK_STATUS.RUNNING, CHESS_CLOCK_STATUS.FINISHED].includes(chessClockStatus) ? (
