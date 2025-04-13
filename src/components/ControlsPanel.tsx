@@ -74,7 +74,7 @@ const ControlsPanel = () => {
     } else {
       startButtonRef.current.blur();
     }
-  }, [status]);
+  }, [chessClockStatus]);
 
   const content = (showResetConfirmation) ? (
     <>
@@ -104,7 +104,7 @@ const ControlsPanel = () => {
           icon={(<Icon size={32} name={'reset'}/>)}
         />
         ) : null}
-      {status !== CHESS_CLOCK_STATUS.FINISHED ? (
+      {chessClockStatus !== CHESS_CLOCK_STATUS.FINISHED ? (
         <ControlPanelButton
           onClick={onActionClick}
           icon={(<Icon size={32} name={chessClockStatus === CHESS_CLOCK_STATUS.RUNNING ? 'pause': 'play'}/> )}
