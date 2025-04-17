@@ -5,7 +5,7 @@ import { getChessClockSize } from "@/helpers";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
 const ChessClock = () => {
-    const windowSize =  useWindowSize();
+    const windowSize = useWindowSize();
     const chessClockSize = getChessClockSize(windowSize);
     
     return (

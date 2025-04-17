@@ -1,4 +1,4 @@
-import { ReactElement, useState, useCallback, useEffect, useRef, forwardRef } from "react";
+import { FC, ReactElement, useState, useCallback, useEffect, useRef, forwardRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { CHESS_CLOCK_STATUS } from "@/types";
@@ -29,6 +29,23 @@ const ControlPanelButton = forwardRef<HTMLButtonElement, ControlPanelButtonProps
   }
 );
 
+type ControlPanelConfirmButtonProps = {
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  text: string;
+};
+
+const ControlPanelConfirmButton: FC<ControlPanelConfirmButtonProps> = ({ onClick, text }) => {
+    return (
+      <Button
+        className="px-3 py-1 text-sm"
+        variant="secondary"
+        onClick={onClick}
+      >
+        {text}
+      </Button>
+    );
+};
+
 const ControlsPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -52,6 +69,7 @@ const ControlsPanel = () => {
   }, [ chessClockStatus ]);
 
   const onResetClick = useCallback(() => {
+    // skip asking for confirmation when status is 'finished'
     if (chessClockStatus === CHESS_CLOCK_STATUS.FINISHED) {
       dispatch(reset());
     } else {
@@ -80,20 +98,8 @@ const ControlsPanel = () => {
     <>
     <div className="flex items-center justify-center gap-4 p-4  text-black">
       <span className="text-sm font-medium">Reset?</span>
-      <Button
-        className="px-3 py-1 text-sm"
-        variant="secondary"
-        onClick={onConfirmResetClick}
-      >
-        Yes
-      </Button>
-      <Button
-        className="px-3 py-1 text-sm"
-        variant="secondary"
-        onClick={() => setShowResetConfirmation(false)}
-      >
-        No
-      </Button>
+      <ControlPanelConfirmButton text="Yes" onClick={onConfirmResetClick}/>
+      <ControlPanelConfirmButton text="No" onClick={() => setShowResetConfirmation(false)}/>
     </div>
     </>
   ) : (
