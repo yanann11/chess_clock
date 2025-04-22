@@ -1,6 +1,6 @@
 # Chess clock web application
 
-A simple and customizable chess clock built with React. [Live Demo](https://chess-clock-fhxv.vercel.app/)
+A simple and customizable chess clock built with React. [Live Demo](https://chess-clock-delta.vercel.app/)
 
 
 

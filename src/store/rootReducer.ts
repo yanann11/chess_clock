@@ -3,7 +3,7 @@ import { RootState } from ".";
 import { INITIAL_TIME, INITIAL_INCREMENT } from "@/consts"
 import { CHESS_CLOCK_STATUS, CHESS_PLAYER_COLOR, CHESS_CLOCK_STATE, SAVE_SETTINGS_ACTION, CHESS_PLAYER_STATE } from "@/types";
 
-const WhitePlayerInitialState = {
+const WhitePlayerInitialState: CHESS_PLAYER_STATE = {
     color: CHESS_PLAYER_COLOR.WHITE,
     time: INITIAL_TIME,
     increment: INITIAL_INCREMENT,
@@ -11,7 +11,7 @@ const WhitePlayerInitialState = {
     clicks: 0
 };
 
-const BlackPlayerInitialState = Object.assign({}, WhitePlayerInitialState, {
+const BlackPlayerInitialState: CHESS_PLAYER_STATE = Object.assign({}, WhitePlayerInitialState, {
     color: CHESS_PLAYER_COLOR.BLACK
 });
 
